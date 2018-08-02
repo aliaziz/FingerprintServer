@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Fingerprint report</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="stylesheets/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src="javascript/jquery.min.js"></script>
+    <script src="javascript/bootstrap.min.js"></script>
+    <script src="javascript/angular.min.js"></script>
+    <!--<script type="text/javascript" src="js/angular-route.min.js"></script>-->
+    <!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>-->
+</head>
+<body>
+<div ng-app="fingerprint"class="container" ng-controller="controllerX">
+
+    <h1>Employee fingerprint details</h1>
+    <div w3-include-html="tabsLink.html"></div>
+	
+    <table class="table table-condesed table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>Employee Code</th>
+            <th>Supervisor Code</th>
+            <th>Supervisor Comment</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="employee in fingerprintContent">
+            <td style ="word-break:break-all;">{{employee.employeeCode}}</td>
+            <td style ="word-break:break-all;">{{employee.supervisorCode}}</td>
+            <td style ="word-break:break-all;">{{employee.comment}}</td>
+            <!--<td style ="word-break:break-all;"><button class="btn btn-danger" ng-click="removeService(service._id)">Remove</button></td>
+            <td style ="word-break:break-all;"><button class="btn btn-warning" ng-click="editService(service._id)">Edit</button></td>-->
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    var app = angular.module('fingerprint', []);
+    app.controller('controllerX', function($scope, $http) {
+        $http({
+            method : "GET",
+            url : "/fingerprintCore/submitSupervisorComment"
+        }).then(function mySucces(response) {
+
+            $scope.fingerprintContent = response.data;
+            console.log($scope.fingerprintContent+" "+response.data);
+
+        }, function myError(response) {
+
+            $scope.fingerprintContent = response.statusText;
+
+        });
+    });
+</script>
+<script src="javascript/includeHTML.js"></script>
+</body>
+</html>

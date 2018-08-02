@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Fingerprint report</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="stylesheets/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src="javascript/jquery.min.js"></script>
+    <script src="javascript/bootstrap.min.js"></script>
+    <script src="javascript/angular.min.js"></script>
+    <!--<script type="text/javascript" src="javascript/main.js"></script>-->
+    <!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>-->
+</head>
+<body>
+<div ng-app="fingerprint" class="container" ng-controller="controllerX">
+
+    <h1>Branches</h1>
+    <div w3-include-html="tabsLink.html"></div>
+
+    <div class="container">
+
+        <form class="form-horizontal" name="create_branch_form">
+            <div class="form-group">
+                <label class="control-label col-sm-2" >Branch Name:</label>
+                <div class="col-sm-10">
+                    <input type="text" required="required" class="form-control" placeholder="Branch Name" ng-model="branch_name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" >Address 1:</label>
+                <div class="col-sm-10">
+                    <input type="text" required="required" class="form-control" placeholder="Address 1" ng-model="address_one">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" >Address 2:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" placeholder="Address 2" ng-model="address_two">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2">Supervisor</label>
+                <div class="col-sm-10">
+                    <select class="form-control" required="required" ng-model="supervisor" ng-options="supervisor for supervisor in supervisorsList"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" >Branch Telephone:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" required="required" placeholder="Telephone number" ng-model="branch_telephone">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default" ng-click="
+                    addBranch(
+                    branch_name, address_one,address_two,
+                                    supervisor, branch_telephone)">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <!--Search form-->
+    <form>
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
+
+                <input type="text" class="form-control" placeholder="Search Anything" ng-model="search">
+
+            </div>
+        </div>
+    </form>
+
+    <table class="table table-condesed table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>Branch Code</th>
+            <th>Branch Name</th>
+            <th>Address one</th>
+            <th>Address two</th>
+            <th>Supervisor</th>
+            <th>Branch Telephone</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><input type="text" class="form-control" ng-model="branch_code_edit" ng-value="branch_code_edit_text"></td>
+            <td><input type="text" ng-required="required" class="form-control" ng-model="branch_name_edit" ng-value=""></td>
+            <td><input type="text" class="form-control" ng-model="branch_address_one_edit" ng-value=""></td>
+            <td><input type="text" class="form-control" ng-model="branch_address_two_edit" ng-value=""></td>
+            <td><select class="form-control" ng-model="supervisor_edit" id="supervisorSelect" ng-options="supervisor for supervisor in supervisorsList"></select></td>
+            <td><input type="text" class="form-control" ng-model="branch_telephone_edit" ng-value=""></td>
+            <td style ="word-break:break-all;"><button class="btn btn-success" ng-click="updateBranch(branch_code_edit_text,
+                                                                                            branch_name_edit,
+                                                                                             branch_address_one_edit,
+                                                                                            branch_address_two_edit,
+                                                                                            supervisor_edit,
+                                                                                             branch_telephone_edit)">Update branch</button></td>
+        </tr>
+        <tr ng-repeat="branchDetail in branchList | orderBy:sortType:sortReverse | filter:search">
+            <td style ="word-break:break-all;">{{branchDetail.branchCode}}</td>
+            <td style ="word-break:break-all;">{{branchDetail.branchName}}</td>
+            <td style ="word-break:break-all;">{{branchDetail.branchAddressOne}}</td>
+            <td style ="word-break:break-all;">{{branchDetail.branchAddressTwo}}</td>
+            <td style ="word-break:break-all;">{{branchDetail.branchSupervisor}}</td>
+            <td style ="word-break:break-all;">{{branchDetail.branchTel}}</td>
+            <td style ="word-break:break-all;"><button class="btn btn-danger" ng-click="removeBranch(branchDetail._id)">Delete Branch</button></td>
+            <td style ="word-break:break-all;"><button class="btn btn-success" ng-click="editBranch(branchDetail._id)">Edit branch</button></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    var app = angular.module('fingerprint', []);
+    app.controller('controllerX', function($scope, $http) {
+        $scope.supervisorsList = [];
+        $scope.branch_code_edit_text = "";
+        $scope.branch_name_edit_text = "";
+        $scope.address_one_edit_text = "";
+        $scope.address_two_edit_text = "";
+        $scope.branch_telephone_edit_text = "";
+
+        //refresh content
+        var refreshContent = function(){
+            $http({
+                method : "GET",
+                url : "/fingerprintCore//getBranches/getAllBranches"
+            }).then(function mySucces(response) {
+
+                $scope.branchList = response.data.content;
+                console.log(response.data.content);
+                console.log($scope.branchList);
+
+            }, function myError(response) {
+
+                $scope.branchList = response.statusText;
+
+            });
+        };
+        refreshContent();
+
+        //get all supervisors
+        var getAllSupervisors = function(){
+            $http({
+                method:"GET",
+                url : "/fingerprintCore/fingerprint/supervisorOnly/getSupervisors"
+            }).then(function success(response){
+
+                if(response.data.content.length <1){
+                    $scope.supervisorsList.push("Admin");
+                }else{
+                    for (var x=0; x<response.data.content.length;x++){
+                        $scope.supervisorsList.push(response.data.content[x].employeeCode+" "+
+                        response.data.content[x].first_name+" "+response.data.content[x].last_name);
+                    }
+                }
+
+                console.log("supervisor array count "+$scope.supervisorsList.length);
+            })
+        };
+
+        getAllSupervisors();
+
+        //delete branch
+        $scope.removeBranch = function(id){
+
+            if (confirm("Are you sure you want to remove this branch?") == true) {
+                console.log(id+" ===");
+                $http({
+                    method:"DELETE",
+                    url:"/fingerprintCore/getBranches/removeBranch/"+id
+                }).then(function succeeded(response){
+                    console.log(response);
+                    refreshContent();
+                },function failure(responseErr){
+                    console.log(responseErr);
+                });
+            }
+
+        };
+
+        //update branch
+        $scope.updateBranch = function(branchCode,branchName, branchAddress1,branchAddress2,
+        branchSupervisor, branchTel){
+            console.log(branchCode+" "+branchName+" "+branchTel+" "+branchAddress1+" "+branchAddress2);
+            if((branchName!=undefined) && branchTel!= undefined){
+                $http({
+                    method:"PUT",
+                    url:"/fingerprintCore/getBranches/updateBranch/"+branchCode,
+                    data:
+                    {'branchName' : branchName,'branchAddress1':branchAddress1,
+                    'branchAddress2':branchAddress2, 'branchSupervisor':branchSupervisor,
+                    'branchTel':branchTel
+                    }
+
+                }).then(function succeeded(response){
+                    console.log(response);
+                    refreshContent();
+                },function failed(responseErr){
+                console.log(responseErr);
+            });
+            }else{
+                alert("All fields must be filled!")
+            }
+        };
+
+        //edit branch
+        $scope.editBranch = function(branchID){
+
+            console.log(branchID+" ==>>><<<");
+            $http({
+                method:"GET",
+                url:"/fingerprintCore/getBranches/getOneBranch/"+branchID
+
+            }).then(function succeeded(response){
+                console.log(response.data.content);
+                $scope.branch_code_edit_text = response.data.content.branchCode;
+                $scope.branch_name_edit_text = response.data.content.branchName;
+                $scope.address_one_edit_text = response.data.content.branchAddressOne;
+                $scope.address_two_edit_text = response.data.content.branchAddressTwo;
+                $scope.branch_telephone_edit_text = response.data.content.branchTel;
+            },function failed(responseErr){
+                console.log(responseErr);
+            });
+
+        };
+
+        //add new branch
+        $scope.addBranch = function(branchName, branchAddress1,branchAddress2,
+                                    branchSupervisor, branchTel){
+
+            console.log(branchName+" "+branchAddress1+" "+branchAddress2+" "+branchSupervisor
+            +" "+branchTel);
+
+            if(branchName!=undefined && branchTel!=undefined && branchSupervisor!=undefined){
+
+                //first get branch code
+                $http({
+                    method:"GET",
+                    url:"/fingerprintCore/getBranches/getNewBranchCode"
+                }).then(function success(response){
+                    console.log(response.data.content.branchCode);
+                    if(response.data.content.branchCode == undefined){
+                        $http({
+                            method:"POST",
+                            url:"/fingerprintCore/addNewBranch",
+                            data:
+                            {   'branchCode'    :response.data.content[0].branchCode,
+                                'branchName'    :branchName,
+                                'branchAddressOne':branchAddress1,
+                                'branchAddressTwo':branchAddress2,
+                                'branchSupervisor':branchSupervisor,
+                                'branchTel'     :branchTel
+                            }
+
+                        }).then(function succeeded(response){
+                            console.log(response);
+                            refreshContent();
+                        },function failed(responseErr){
+                            console.log(responseErr);
+                        });
+                    }else{
+                        $http({
+                            method:"POST",
+                            url:"/fingerprintCore/addNewBranch",
+                            data:
+                            {   'branchCode'    :response.data.content.branchCode,
+                                'branchName'    :branchName,
+                                'branchAddressOne':branchAddress1,
+                                'branchAddressTwo':branchAddress2,
+                                'branchSupervisor':branchSupervisor,
+                                'branchTel'     :branchTel
+                            }
+
+                        }).then(function succeeded(response){
+                            console.log(response);
+                            refreshContent();
+                        },function failed(responseErr){
+                            console.log(responseErr);
+                        });
+                    }
+                });
+            }else{
+                alert("All fields are required");
+
+            }
+        };
+    });
+
+</script>
+<script src="javascript/includeHTML.js"></script>
+</body>
+</html>

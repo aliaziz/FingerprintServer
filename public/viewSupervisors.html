@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Fingerprint report</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="stylesheets/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src="javascript/jquery.min.js"></script>
+    <script src="javascript/bootstrap.min.js"></script>
+    <script src="javascript/angular.min.js"></script>
+    <script src="javascript/configIP.js"></script>
+    <!--<script type="text/javascript" src="javascript/main.js"></script>-->
+    <!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>-->
+</head>
+<body>
+<div ng-app="fingerprint" class="container" ng-controller="controllerX" style="padding: 20px">
+
+    <h1>Supervisors Only</h1>
+    <div w3-include-html="tabsLink.html"></div>
+
+    <!--Search form-->
+    <form>
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
+
+                <input type="text" class="form-control" placeholder="Search Anything" ng-model="search">
+
+            </div>
+        </div>
+    </form>
+
+    <table class="table table-condesed table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>Supervisor Employee Code</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Branches Supervised</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="employee in fingerprintContent | orderBy:sortType:sortReverse | filter:search">
+            <td style ="word-break:break-all;">{{employee.employeeCode}}</td>
+            <td style ="word-break:break-all;">{{employee.first_name}}</td>
+            <td style ="word-break:break-all;">{{employee.last_name}}</td>
+            <!--<td style ="word-break:break-all;">{{employee.supervisedBranches}}</td>-->
+            <td style ="word-break:break-all;">
+                <ul>
+                    <li ng-repeat ="branches in employee.supervisedBranches track by $index"><button style="width: 100px; margin: 5px;" class="btn btn-default">{{branches}}</button><button class="btn btn-danger" ng-click="removeOneBranch(branches,employee._id)">-</button></li>
+                </ul>
+            </td>
+            <!--<td style ="word-break:break-all;"><button type="button" class="btn btn-info" ng-click="setEmpCodeSelected(employee.employeeCode)" data-toggle="modal" data-target="#branchesModal">{{employee.emp_branch}}</button></td>-->
+            <td style ="word-break:break-all;"><button class="btn btn-warning" ng-click="removeSuperVisor(employee.employeeCode, employee.emp_branch)">Remove Supervisor rights</button></td>
+            <td style ="word-break:break-all;"><button class="btn btn-success" ng-click="setEmpCodeSelected(employee.employeeCode)"  data-toggle="modal" data-target="#branchesModal">+</button></td>
+            <td style ="word-break:break-all;"><button class="btn btn-danger" ng-click="disableUser(employee._id)">Disable</button></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="branchesModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Add another branch for supervisor</h4>
+                </div>
+                <div class="modal-body">
+                    <select class="form-control" ng-model="selectedBranch" ng-options="branch for branch in branchesList"></select>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" ng-click="updateBranch(selectedEmpCode,selectedBranch)">Proceed</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    var app = angular.module('fingerprint', []);
+    app.controller('controllerX', function($scope, $http) {
+        $scope.sortType     = 'first_name'; // set the default sort type
+        $scope.sortReverse  = false;  // set the default sort order
+        $scope.buttonText = "";
+        $scope.buttonClass ="";
+        $scope.selectedEmpCode = "";
+        $scope.branchesList = [];
+
+        //refresh content
+        var refreshContent = function(){
+            $http({
+                method : "GET",
+                url : "/fingerprintCore/fingerprint/supervisorOnly/getSupervisors"
+            }).then(function mySucces(response) {
+
+                $scope.fingerprintContent = response.data.content;
+                console.log("supervisor details "+response.data.content);
+
+            }, function myError(response) {
+
+                $scope.fingerprintContent = response.statusText;
+
+            });
+        };
+        refreshContent();
+
+        var getAllBranches = function(){
+            $http({
+                method : "GET",
+                url : "/fingerprintCore//getBranches/getAllBranches"
+            }).then(function mySucces(response) {
+
+                $scope.branchList = response.data.content;
+                console.log(response.data.content);
+                console.log($scope.branchList);
+                for (var i=0; i<$scope.branchList.length; i++){
+                    console.log($scope.branchList[i].branchName);
+                    $scope.branchesList.push($scope.branchList[i].branchName);
+                }
+
+            }, function myError(response) {
+
+                $scope.branchList = response.statusText;
+
+            });
+        };
+
+        getAllBranches();
+
+        //set empcode selected
+        $scope.setEmpCodeSelected = function(empCodeSelected){
+            $scope.selectedEmpCode = empCodeSelected;
+        };
+
+        //remove supervisor rights
+        $scope.removeSuperVisor = function (employeeCode, empBranch){
+            console.log(employeeCode+" ===");
+            $http({
+                method : "GET",
+                url : "/fingerprintCore/fingerprint/downgradeRights/"+employeeCode+"/"+empBranch
+            }).then(function mySucces(response) {
+
+                $scope.fingerprintContent = response.data.content;
+                console.log("returned downgrade "+response.data.content);
+                if($scope.fingerprintContent!=undefined){
+                    alert("Successfully downgraded to normal user");
+                    refreshContent();
+                }else{
+                    alert("Failed");
+                }
+
+            }, function myError(response) {
+
+                $scope.fingerprintContent = response.statusText;
+
+            });
+        };
+
+        //delete user
+        $scope.disableUser = function(id){
+            console.log(id+" ===");
+            $http({
+                method:"DELETE",
+                url:"/fingerprintCore/fingerprint/disable/"+id
+            }).then(function succeeded(response){
+                console.log(response);
+                refreshContent();
+            },function failure(responseErr){
+                console.log(responseErr);
+            });
+        };
+
+        //update branch
+        $scope.changeBranch = function(employeeCode,newBranch){
+            console.log(employeeCode+" "+newBranch);
+            $http({
+                method:"PUT",
+                url:"/fingerprintCore/fingerprint/changeBranch/"+employeeCode+"/"+newBranch
+            }).then(function succeeded(response){
+                console.log(response);
+                refreshContent();
+            },function failed(responseErr){
+                console.log(responseErr);
+            });
+
+        };
+
+        $scope.removeOneBranch = function(oneBranchName, id){
+            console.log(oneBranchName+" "+id);
+            $http({
+                method:"GET",
+                url:"/fingerprintCore/fingerprint/removeOneBranch/"+oneBranchName+"/"+id
+            }).then(function succeeded(response){
+                console.log(response);
+                refreshContent();
+            },function failed(responseErr){
+                console.log(responseErr);
+            });
+        };
+
+        //make supervisor
+        $scope.updateBranch = function (employeeCode,branchToBeSupervised){
+            console.log(employeeCode+" ===");
+            $http({
+                method : "GET",
+                url : "/fingerprintCore/fingerprint/advanceRights/"+employeeCode+"/"+branchToBeSupervised
+            }).then(function mySucces(response) {
+
+                $scope.fingerprintContent = response.data.content;
+                if($scope.fingerprintContent!=undefined){
+                    alert("Successfully updated");
+                    refreshContent();
+                }else{
+                    alert("Failed");
+                }
+
+            }, function myError(response) {
+
+                $scope.fingerprintContent = response.statusText;
+
+            });
+        };
+
+    });
+
+</script>
+<script src="javascript/includeHTML.js"></script>
+</body>
+</html>

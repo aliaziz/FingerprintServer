@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Fingerprint report</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="stylesheets/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src="javascript/jquery.min.js"></script>
+    <script src="javascript/bootstrap.min.js"></script>
+    <script src="javascript/angular.min.js"></script>
+    <!--<script type="text/javascript" src="javascript/main.js"></script>-->
+    <!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>-->
+</head>
+<body>
+<div ng-app="fingerprint" id="linksHeader" class="container" ng-controller="controllerX">
+
+    <h1>Employee summary</h1>
+    <div w3-include-html="tabsLink.html"></div>
+
+    <!--Search form-->
+    <form>
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
+
+                <input type="text" class="form-control" placeholder="Search Anything" ng-model="search">
+
+            </div>
+        </div>
+    </form>
+    <div id = "alert_placeholder"></div>
+    <table class="table table-condesed table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>Employee Code</th>
+            <th>InActive hours</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="employee in fingerprintContent | filter:search">
+            <td style ="word-break:break-all;">{{employee.employeeCode}}</td>
+            <td style ="word-break:break-all;">{{employee.sessionDelayedPeriod}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    var app = angular.module('fingerprint', []);
+    app.controller('controllerX', function($scope, $http) {
+        $scope.fingerprintContent = [];
+
+        var refreshPage = function(){
+            window.location.reload();
+        };
+
+        //refresh content
+        var refreshContent = function(){
+            $http({
+                method : "GET",
+                url : "/fingerprintCore/fingerprint/getDelayedActivation"
+            }).then(function mySucces(response) {
+
+                $scope.fingerprintContent = response.data.content;
+
+            }, function myError(response) {
+
+                $scope.fingerprintContent = response.statusText;
+
+            });
+        };
+		
+        refreshContent();
+    });
+
+</script>
+<script src="javascript/includeHTML.js"></script>
+</body>
+</html>

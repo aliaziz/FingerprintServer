@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Fingerprint report</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="stylesheets/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src="javascript/jquery.min.js"></script>
+    <script src="javascript/bootstrap.min.js"></script>
+    <script src="javascript/angular.min.js"></script>
+    <!--<script type="text/javascript" src="js/angular-route.min.js"></script>-->
+    <!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>-->
+</head>
+<body>
+<div class="container" ng-app="fingerprint" ng-controller="controllerX" style="padding: 20px">
+
+    <h1>Employee time at work report</h1>
+    <div w3-include-html="tabsLink.html"></div>
+
+    <!--Search form-->
+    <form>
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-addon"><i class="glyphicon glyphicon-search"></i></div>
+
+                <input type="text" class="form-control" placeholder="Search Anything" ng-model="search">
+
+            </div>
+        </div>
+    </form>
+
+    <div id = "alert_placeholder"></div>
+    <table class="table table-condesed table-striped table-bordered" show-filter="true">
+        <thead>
+        <tr>
+            <th>Employee Code</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Branch</th>
+            <th>Logged in</th>
+            <th>Login Time</th>
+            <th>Logout Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="employee in fingerprintContent | orderBy:sortType:sortReverse | filter:search">
+            <td style ="word-break:break-all;">{{employee.empCode}}</td>
+            <td style ="word-break:break-all;">{{employee.first_name}}</td>
+            <td style ="word-break:break-all;">{{employee.last_name}}</td>
+            <td style ="word-break:break-all;">{{employee.emp_branch}}</td>
+            <td style ="word-break:break-all;">{{employee.isLoggedIn}}</td>
+            <td style ="word-break:break-all;">{{employee.loginTime}}</td>
+            <td style ="word-break:break-all;">{{employee.logoutTime}}</td>
+            <!-- <td style ="word-break:break-all;"><button class="btn btn-danger" ng-click="removeService(service._id)">Remove</button></td>
+             <td style ="word-break:break-all;"><button class="btn btn-warning" ng-click="editService(service._id)">Edit</button></td>-->
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    var app = angular.module('fingerprint', []);
+    app.controller('controllerX', function($scope, $http) {
+        $scope.sortType     = 'first_name'; // set the default sort type
+        $scope.sortReverse  = true;  // set the default sort order
+        $http({
+            method : "GET",
+            url : "/fingerprintCore/timeAtWorkSupervisor"
+        }).then(function mySucces(response) {
+
+            $scope.fingerprintContent = response.data;
+            console.log($scope.fingerprintContent+" "+response.data);
+
+        }, function myError(response) {
+
+            $scope.fingerprintContent = response.statusText;
+
+        });
+    });
+</script>
+<script src="javascript/includeHTML.js"></script>
+</body>
+</html>
