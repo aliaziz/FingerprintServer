@@ -77,12 +77,32 @@ router.get('/fingerprint/getDelayedActivation', function(req, res) {
 			res.json({
 				"success": false
 			});
+		}else if (doc.length > 0){
+            getEmployee(doc.employeeCode, function(err, response) {
+                if(err) {
+                    res.json({
+                        "success": false
+                    });
+                } else {
+                    var updatedResponse = {
+                                    "firstName": response.first_name,
+                                    "lastName": response.last_name,
+                                    "phoneNumber": response.phone_number,
+                                    "employeeCode": doc.employeeCode,
+                                    "sessionDelayedPeriod": doc.sessionDelayedPeriod
+                                }
+                    res.json({
+                        "success": true,
+                        "content": updatedResponse
+                    });
+                }
+            });
 		}else {
-			res.json({
-				"success": true,
-				"content": doc
-			});
-		}
+            res.json({
+                "success": true,
+                "content": doc
+            });
+        }
 	})
 });
 
@@ -174,7 +194,7 @@ router.get('/fingerprint/getPassword', function(req, res){
 });
 
 router.get('/fingerprint/:empCode', function(req, res){
-    fingerPrintModel.findOne({'employeeCode':req.params.empCode},function(err, response){
+    getEmployee(req.params.empCode, function(err, response) {
         if(err){
             res.json({
                     "success": false,
@@ -196,6 +216,18 @@ router.get('/fingerprint/:empCode', function(req, res){
         }
     });
 });
+
+function getEmployee(code, callback){
+    fingerPrintModel.findOne({'employeeCode':code},function(err, response){
+        if(err){
+            callback(err, undefined);
+        }else if(response!=null){
+            callback(undefined, response);
+        }else{
+            callback(err, undefined);
+        }
+    });
+}
 
 //get supervisors only
 router.get('/fingerprint/supervisorOnly/getSupervisors', function(req, res){

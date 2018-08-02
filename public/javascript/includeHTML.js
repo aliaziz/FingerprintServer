@@ -30,7 +30,7 @@ includeHTML();
 
 function makeButtonsClickable() {
 	// Add active class to the current button (highlight it)
-	var header = document.getElementsByClassName("container-fluid")[0];
+	var header = document.getElementById("linksHeader");
 	var btns = header.getElementsByClassName("btn btn-default");
 	for (var i = 0; i < btns.length; i++) {
 	  btns[i].addEventListener("click", function() {

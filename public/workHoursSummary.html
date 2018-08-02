@@ -36,12 +36,18 @@
         <thead>
         <tr>
             <th>Employee Code</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Phone number</th>
             <th>InActive hours</th>
         </tr>
         </thead>
         <tbody>
         <tr ng-repeat="employee in fingerprintContent | filter:search">
             <td style ="word-break:break-all;">{{employee.employeeCode}}</td>
+            <td style ="word-break:break-all;">{{employee.firstName}}</td>
+            <td style ="word-break:break-all;">{{employee.lastName}}</td>
+            <td style ="word-break:break-all;">{{employee.phoneNumber}}</td>
             <td style ="word-break:break-all;">{{employee.sessionDelayedPeriod}}</td>
             </tr>
         </tbody>
