@@ -79,7 +79,7 @@
 				var today = new Date(response.data[x].logoutTime *1);
 				
 				response.data[x].logoutTime = formatTime(today);
-                if(response.data[x].isSuperVisor != undefined){
+                if(response.data[x].isSuperVisor != undefined && !response.data[x].isLoggedIn){
                     console.log(response.data[x].isSuperVisor);
                     if(!response.data[x].isSuperVisor){
                         $scope.fingerprintContent.push(response.data[x]);

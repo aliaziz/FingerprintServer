@@ -8,7 +8,8 @@ var Schema = mongoose.Schema;
 var fingerPrintModel = new Schema({
     first_name: String,
     last_name: String,
-    phone_number: String,
+    emp_phoneNumber: String,
+    emp_NSSFNumber: String,
     email: String,
     employeeCode:String,
     image_blob: String,

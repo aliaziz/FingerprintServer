@@ -43,12 +43,12 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="employee in fingerprintContent | filter:search">
+        <tr ng-repeat="employee in empDetails | filter:search">
             <td style ="word-break:break-all;">{{employee.employeeCode}}</td>
-            <td style ="word-break:break-all;">{{employee.firstName}}</td>
-            <td style ="word-break:break-all;">{{employee.lastName}}</td>
-            <td style ="word-break:break-all;">{{employee.phoneNumber}}</td>
-            <td style ="word-break:break-all;">{{employee.sessionDelayedPeriod}}</td>
+            <td style ="word-break:break-all;">{{employee.first_name}}</td>
+            <td style ="word-break:break-all;">{{employee.last_name}}</td>
+            <td style ="word-break:break-all;">{{employee.phone_number}}</td>
+            <td style ="word-break:break-all;">{{empDelays[$index].sessionDelayedPeriod}}</td>
             </tr>
         </tbody>
     </table>
@@ -58,7 +58,8 @@
 <script>
     var app = angular.module('fingerprint', []);
     app.controller('controllerX', function($scope, $http) {
-        $scope.fingerprintContent = [];
+        $scope.empDelays = [];
+		$scope.empDetails = []
 
         var refreshPage = function(){
             window.location.reload();
@@ -70,11 +71,12 @@
                 method : "GET",
                 url : "/fingerprintCore/fingerprint/getDelayedActivation"
             }).then(function mySucces(response) {
-
-                $scope.fingerprintContent = response.data.content;
+				$scope.empDetails = response.data.empDetails
+				$scope.empDelays = response.data.empDelays
 
             }, function myError(response) {
 
+				console.log(response);
                 $scope.fingerprintContent = response.statusText;
 
             });

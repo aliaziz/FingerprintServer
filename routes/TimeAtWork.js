@@ -29,7 +29,7 @@ router.get('/timeAtWork/',function(req, res){
     });
 });
 router.get('/timeAtWorkSupervisor/',function(req, res){
-    timeAtWorkModel.find({'isSuperVisor': true}, function(err, timeAtWorkDetails){
+    timeAtWorkModel.find({'isSuperVisor': true, 'isLoggedIn': false}, function(err, timeAtWorkDetails){
         if(err){
             res.json(err);
         }
@@ -38,36 +38,73 @@ router.get('/timeAtWorkSupervisor/',function(req, res){
 });
 
 router.post('/timeAtWorkSupervisor',function(req,res){
-    var timeAtWorkModelSupervisorInstance  = new timeAtWorkModel(req.body);
-    timeAtWorkModelSupervisorInstance.save(function(err, doc) {
+	timeAtWorkModel.findOneAndUpdate({'empCode':req.body.empCode},{
+             $set:{'logoutTime':req.body.logoutTime,
+			 'loginTime': req.body.loginTime,
+			 'isLoggedIn': req.body.isLoggedIn}
+        },
+        {new:true},function(err, response){
         if (err) {
             return res.json(err);
-        }
-        else {
-            console.log(req.body.empCode+" time at work supervisor "+doc);
+        }else if(response!=null){
             res.json({
-                "success":true,
-                "content":doc
+                "success": true,
+                "content": response
             });
+        }else{
+            var timeAtWorkModelSupervisorInstance  = new timeAtWorkModel(req.body);
+			timeAtWorkModelSupervisorInstance.save(function(err, doc) {
+				if (err) {
+					return res.json(err);
+				}
+				else {
+					console.log(req.body.empCode+" time at work supervisor "+doc);
+					res.json({
+						"success":true,
+						"content":doc
+					});
 
+				}
+			});
         }
     });
 });
 
 router.post('/timeAtWork',function(req,res){
-    var timeAtWorkModelInstance  = new timeAtWorkModel(req.body);
-    timeAtWorkModelInstance.save(function(err, doc) {
+	 timeAtWorkModel.findOneAndUpdate({'empCode':req.body.empCode},{
+             $set:{'logoutTime':req.body.logoutTime,
+			 'loginTime': req.body.loginTime,
+			 'isLoggedIn': req.body.isLoggedIn}
+        },
+        {new:true},function(err, response){
         if (err) {
+			console.log("errored "+ err);
             return res.json(err);
-        }
-        else {
+        }else if(response!=null){
+			console.log("not null "+ response);
             res.json({
-                "success":true,
-                "content":doc
+                "success": true,
+                "content": response
             });
+        }else{
+            var timeAtWorkModelInstance  = new timeAtWorkModel(req.body);
+			timeAtWorkModelInstance.save(function(err, doc) {
+				if (err) {
+			console.log("error "+ err);
+					return res.json(err);
+				}
+				else {
+			console.log("not null "+ doc);
+					res.json({
+						"success":true,
+						"content":doc
+					});
 
+				}
+			});
         }
     });
+    
 });
 
 router.get('/workHours/:empCode/:dateOnly',function(req, res){

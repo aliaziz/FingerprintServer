@@ -78,25 +78,25 @@ router.get('/fingerprint/getDelayedActivation', function(req, res) {
 				"success": false
 			});
 		}else if (doc.length > 0){
-            getEmployee(doc.employeeCode, function(err, response) {
-                if(err) {
-                    res.json({
-                        "success": false
-                    });
-                } else {
-                    var updatedResponse = {
-                                    "firstName": response.first_name,
-                                    "lastName": response.last_name,
-                                    "phoneNumber": response.phone_number,
-                                    "employeeCode": doc.employeeCode,
-                                    "sessionDelayedPeriod": doc.sessionDelayedPeriod
-                                }
-                    res.json({
-                        "success": true,
-                        "content": updatedResponse
-                    });
-                }
-            });
+			var promises = [];
+			
+			for (var pos = 0; pos < doc.length; pos++) {
+				var empCode = doc[pos].employeeCode;
+				promises.push(getEmployee(empCode));
+			}
+
+			Promise.all(promises)    
+			 .then(function(data){ 
+				res.json({
+					"success": true, 
+					"empDetails": data,
+					"empDelays": doc
+				});
+			 }).catch(function(err){ 
+				res.json({
+					"success": false
+				});
+			 });    
 		}else {
             res.json({
                 "success": true,
@@ -194,39 +194,34 @@ router.get('/fingerprint/getPassword', function(req, res){
 });
 
 router.get('/fingerprint/:empCode', function(req, res){
-    getEmployee(req.params.empCode, function(err, response) {
-        if(err){
-            res.json({
-                    "success": false,
-                    "message": "failed",
-                    "content": err
-                });
-        }else if(response!=null){
-            res.json({
-                "success": true,
-                "message": "passed",
-                "content": response
-            });
-        }else{
-            res.json({
-                "success": false,
-                "message": "failed",
-                "content": "no content"
-            });
-        }
-    });
+	var promise = getEmployee(req.params.empCode);
+	promise.then(function(result) {
+		res.json({
+			"success": true,
+			"message": "passed",
+			"content": result
+		});
+	}, function (err) {
+		res.json({
+			"success": false,
+			"message": "failed",
+			"content": err
+		});
+	});
 });
 
-function getEmployee(code, callback){
-    fingerPrintModel.findOne({'employeeCode':code},function(err, response){
-        if(err){
-            callback(err, undefined);
-        }else if(response!=null){
-            callback(undefined, response);
-        }else{
-            callback(err, undefined);
-        }
-    });
+function getEmployee(code){
+	return new Promise(function(resolve, reject) {
+		fingerPrintModel.findOne({'employeeCode':code},function(err, response){
+			if(err){
+				reject(err)
+			}else if(response!=null){
+				resolve(response)
+			}else{
+				reject(err)
+			}
+		});
+	});
 }
 
 //get supervisors only
