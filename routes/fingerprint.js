@@ -7,6 +7,7 @@ var router = express.Router();
 var fingerPrintModel = require('../models/fingerprintmodel');
 var randomPasswordModel = require('../models/randomPasswordModel');
 var delayedSessionModel = require('../models/delayedSessionActivationModel');
+var lateEmployeesModel = require('../models/lateModels');
 
 
 router.put( '/fingerprint/delayedActivation/:empCode/:date/:hoursAway', function(req, res) {
@@ -69,6 +70,57 @@ router.get('/fingerprint/getDelayedActivation/:empCode', function(req, res) {
 			return doc;
 		}
 	})
+});
+
+router.post('/fingerprint/lateEmployees', function(req, res) {
+	lateEmployeesModel.findOne({'empCode': req.body.empCode}, function (err, lateEmpDoc) {
+		if (err) {
+			res.json({
+				'success': false
+			});
+		}else if (lateEmpDoc != null && lateEmpDoc.date == req.body.date){
+			res.json({
+				'success': true
+			});
+		}else {
+			//new day
+			var lateLoginThreshold = parseInt("09: 30");
+			var lateEmployeeInstance =  new lateEmployeesModel(req.body);
+			if (lateLoginThreshold < parseInt(req.body.time)) {
+				lateEmployeeInstance.isLate = true;
+			}
+			
+			lateEmployeeInstance.save(function(err, doc) {
+				if (err) {
+					res.json({
+						'success': false
+					});
+				}else {
+					res.json({
+						'success': true,
+						'content': doc
+					});
+				}
+			});
+		}
+	});
+
+	
+});
+
+router.get('/fingerprint/getLateEmployees', function(req, res){
+	lateEmployeesModel.find(function(err, doc) {
+		if (err) {
+			res.json({
+				'success': false
+			});
+		}else {
+			res.json({
+				'success': true,
+				'content': doc
+			});
+		}
+	});
 });
 
 router.get('/fingerprint/getDelayedActivation', function(req, res) {

@@ -54,22 +54,8 @@ router.get('/userLoginDetails',function(req, res){
 router.post('/userLoginDetails',function(req,res){
     var bodyContent = req.body;
     var userLoginDetailsInstance  = new loginDetails(req.body);
-    //userLoginDetailsInstance.save(function(error, doc) {
-    //    if (error) {
-    //        return res.json(error);
-    //    }
-    //    else {
-    //        console.log(bodyContent.empCode+" empcode added");
-    //        res.json({
-    //            "success":true,
-    //            "content":doc
-    //        });
-    //
-    //    }
-    //});
     loginDetails.findOne({'empCode':req.body.empCode},
         function(err, userLoginDetailsContent){
-            //console.log(req.body+"  == "+userLoginDetailsContent);
         if(err){
             if (error) {
                 return res.json(error);
