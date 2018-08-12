@@ -74,11 +74,7 @@
             url : "/fingerprintCore/timeAtWork"
         }).then(function mySucces(response) {
 
-            //console.log("supervisor boolean "+response.data[3].isSuperVisor);
             for(var x=0; x<response.data.length; x++){
-				var today = new Date(response.data[x].logoutTime *1);
-				
-				response.data[x].logoutTime = formatTime(today);
                 if(response.data[x].isSuperVisor != undefined && !response.data[x].isLoggedIn){
                     console.log(response.data[x].isSuperVisor);
                     if(!response.data[x].isSuperVisor){
@@ -110,23 +106,6 @@
             });
         };
     });
-	
-	function formatTime(today) {
-		var dd = today.getDate();
-		var mm = today.getMonth()+1; //January is 0!
-		var yyyy = today.getFullYear();
-		var hours = today.getHours();
-		var minutes = today.getMinutes() < 10 ? '0'+today.getMinutes() : today.getMinutes();
-		var seconds = today.getSeconds()< 10 ? '0'+today.getSeconds() : today.getSeconds();
-		if(dd<10){
-			dd='0'+dd;
-		} 
-		if(mm<10){
-			mm='0'+mm;
-		} 
-		var todayNew = dd+'/'+mm+'/'+yyyy+ ' '+hours+ ':'+minutes+':'+seconds;
-		return todayNew;
-	}
 </script>
 <script src="javascript/includeHTML.js"></script>
 </body>

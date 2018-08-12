@@ -10,7 +10,7 @@ var Schema = mongoose.Schema;
 
 var timeAtWorkModel = new Schema({
     loginTime: String,
-    logoutTime: Number,
+    logoutTime: String,
     empCode: String,
     first_name:String,
     last_name:String,
