@@ -143,7 +143,8 @@ router.get('/fingerprint/getDelayedActivation', function(req, res) {
 });
 
 router.post('/fingerprint/lateEmployees', function(req, res) {
-	lateEmployeesModel.findOne({'empCode': req.body.empCode}, function (err, lateEmpDoc) {
+
+	lateEmployeesModel.findOne({'empCode': req.body.empCode, 'date': req.body.date}, function (err, lateEmpDoc) {
 		if (err) {
 			res.json({
 				'success': false
@@ -160,7 +161,6 @@ router.post('/fingerprint/lateEmployees', function(req, res) {
 				else if (timeDoc != null){
 					lateLoginThreshold = parseInt((timeDoc.loginTime).replace(':',''));
 				}
-				console.log("set threshold "+" "+lateLoginThreshold);
 				var lateEmployeeInstance =  new lateEmployeesModel(req.body);
 				if (lateLoginThreshold < parseInt((req.body.time).replace(':',''))) {
 					lateEmployeeInstance.isLate = true;
@@ -343,7 +343,6 @@ function getEmployee(code){
 //get supervisors only
 router.get('/fingerprint/supervisorOnly/getSupervisors', function(req, res){
     fingerPrintModel.find({'isSuperVisor':true},function(err, response){
-        console.log("response "+response);
         if(err){
             res.json({
                 "success": false,
@@ -370,7 +369,6 @@ router.get('/fingerprint/removeOneBranch/:oneBranch/:_id',function(req, res){
     fingerPrintModel.findOne({_id:req.params._id},function(err, response){
         response.supervisedBranches.remove(req.params.oneBranch);
         response.save(function(err, doc){
-            console.log("saved successfully ");
             res.json({
                 "success": true,
                 "message": "passed",
@@ -441,7 +439,6 @@ router.get('/fingerprint/downgradeRights/:empCode/:empBranch', function(req, res
 router.put('/fingerprint/changeBranch/:empCode/:newBranch', function(req, res){
 
     var branch = req.params.newBranch;
-    console.log(branch+" new branch");
 
     fingerPrintModel.findOneAndUpdate({'employeeCode':req.params.empCode},{
         $set:{emp_branch:branch}},{new:true},function(err, response){
@@ -470,7 +467,6 @@ router.put('/fingerprint/changeBranch/:empCode/:newBranch', function(req, res){
 //delete user from database
 router.delete('/fingerprint/disable/:id',function(req, res){
     var id = req.params.id;
-    console.log(id+" ====");
     fingerPrintModel.remove({_id : id }, function(err){
         if(err) return handleError(err);
 
@@ -531,7 +527,6 @@ function makeid()
     for( var i=0; i < 8; i++ )
         text += possible.charAt(Math.floor(Math.random() * possible.length));
 
-    console.log("password generated..."+text);
     return text;
 }
 

@@ -30,13 +30,13 @@ includeHTML();
 
 function makeButtonsClickable() {
 	// Add active class to the current button (highlight it)
-	var header = document.getElementById("linksHeader");
+	var header = document.getElementById("tabsLink");
 	var btns = header.getElementsByClassName("btn btn-default");
 	for (var i = 0; i < btns.length; i++) {
-	  btns[i].addEventListener("click", function() {
-		var current = document.getElementsByClassName("active");
-		current[0].className = current[0].className.replace(" active", "");
-		this.className += " active";
+		btns[i].addEventListener("click", function() {  
+			var current = document.getElementsByClassName("active");
+			current[0].className = current[0].className.replace(" active", "");
+			this.className += " active";
 	  });
 	}
 }
