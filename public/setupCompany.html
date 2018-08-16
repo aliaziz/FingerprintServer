@@ -16,27 +16,27 @@
 <body>
 <div ng-app="fingerprint" class="container" ng-controller="controllerX">
 
-    <h1>Configure IPs</h1>
+    <h1>Add Companies</h1>
 	<div id = "tabsLink" w3-include-html="tabsLink.html"></div>
     <div class="container">
 
         <form class="form-horizontal" name="configure_ip">
             <div class="form-group">
-                <label class="control-label col-sm-2" >Server Name:</label>
+                <label class="control-label col-sm-2" >Company Name:</label>
                 <div class="col-sm-10">
-                    <input type="text" required="required" class="form-control" placeholder="Server Name" ng-model="server_name">
+                    <input type="text" required="required" class="form-control" placeholder="Company Name" ng-model="company_name">
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-sm-2" >Server IP:</label>
+                <label class="control-label col-sm-2" >Company Location:</label>
                 <div class="col-sm-10">
-                    <input type="text" required="required" class="form-control" placeholder="Server IP" ng-model="server_ip">
+                    <input type="text" required="required" class="form-control" placeholder="Company Location" ng-model="company_location">
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-default" ng-click="addIP(server_name, server_ip)">
-                        Add IP
+                    <button type="submit" class="btn btn-default" ng-click="addCompany(company_name, company_location)">
+                        Add Company
                     </button>
                 </div>
             </div>
@@ -59,15 +59,15 @@
     <table class="table table-condesed table-striped table-bordered">
         <thead>
         <tr>
-            <th>Server Name</th>
-            <th>Server IP</th>
+            <th>Company Name</th>
+            <th>Company Location</th>
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="ipDetail in ipList | orderBy:sortType:sortReverse | filter:search">
-            <td style ="word-break:break-all;">{{ipDetail.serverName}}</td>
-            <td style ="word-break:break-all;">{{ipDetail.serverIp}}</td>
-            <td style ="word-break:break-all;"><button class="btn btn-danger" ng-click="removeIP(ipDetail._id)">Delete IP</button></td>
+        <tr ng-repeat="companyDetails in companyList | orderBy:sortType:sortReverse | filter:search">
+            <td style ="word-break:break-all;">{{companyDetails.name}}</td>
+            <td style ="word-break:break-all;">{{companyDetails.location}}</td>
+            <td style ="word-break:break-all;"><button class="btn btn-danger" ng-click="removeIP(companyDetails._id)">Delete Company</button></td>
         </tr>
         </tbody>
     </table>
@@ -76,34 +76,33 @@
 <script>
     var app = angular.module('fingerprint', []);
     app.controller('controllerX', function($scope, $http) {
-        $scope.supervisorsList = [];
 
         //refresh content
         var refreshContent = function(){
             $http({
                 method : "GET",
-                url : "/fingerprintCore/getIps"
+                url : "/fingerprintCore/fingerprint/getCompanies"
             }).then(function mySucces(response) {
 
-                $scope.ipList = response.data.content;
+                $scope.companyList = response.data.content;
                 console.log(response.data.content);
 
             }, function myError(response) {
 
-                $scope.ipList = response.statusText;
+                $scope.companyList = response.statusText;
 
             });
         };
         refreshContent();
 
-        //delete branch
+        //delete ccmpany
         $scope.removeIP = function(id){
 
-            if (confirm("Are you sure you want to remove this ip address?") == true) {
+            if (confirm("Are you sure you want to remove this company?") == true) {
                 console.log(id+" ===");
                 $http({
                     method:"DELETE",
-                    url:"/fingerprintCore/deleteIps/"+id
+                    url:"/fingerprintCore/fingerprint/deleteCompany/"+id
                 }).then(function succeeded(response){
                     console.log(response);
                     refreshContent();
@@ -114,14 +113,14 @@
 
         };
 
-        //add new branch
-        $scope.addIP = function(serverName, serverIP){
+        //add new company
+        $scope.addCompany = function(companyName, companyLocation){
             $http({
                 method:"POST",
-                url:"/fingerprintCore/addIps",
+                url:"/fingerprintCore/fingerprint/addCompanies",
                 data:
-                {   'serverName'    :serverName,
-                    'serverIp'    :serverIP
+                {   'name'    :companyName,
+                    'location':companyLocation
                 }
 
             }).then(function succeeded(response){

@@ -42,15 +42,10 @@ app.use('/fingerprintCore/viewSupervisors', express.static(__dirname + '/public/
 app.use('/fingerprintCore/viewBranches', express.static(__dirname + '/public/createBranch.html'));
 app.use('/fingerprintCore/setupIps', express.static(__dirname + '/public/setupIPs.html'));
 app.use('/fingerprintCore/setupLoginTime', express.static(__dirname + '/public/setupLateTime.html'));
+app.use('/fingerprintCore/setupCompany', express.static(__dirname + '/public/setupCompany.html'));
 app.use('/fingerprintCore/workHoursSummary', express.static(__dirname + '/public/workHoursSummary.html'));
 app.use('/fingerprintCore/lateEmployeesSummary', express.static(__dirname + '/public/lateEmployees.html'));
-
-app.use('/fingerprintCore/stylesheets/bootstrap.min.css', express.static(__dirname + '/public/stylesheets/bootstrap.min.css'));
-app.use('/fingerprintCore/stylesheets/bootstrap-theme.min.css', express.static(__dirname + '/public/stylesheets/bootstrap-theme.min.css'));
-app.use('/fingerprintCore/javascript/jquery.min.js', express.static(__dirname + '/public/javascript/jquery.min.js'));
-app.use('/fingerprintCore/javascript/bootstrap.min.js', express.static(__dirname + '/public/javascript/bootstrap.min.js'));
-app.use('/fingerprintCore/javascript/angular.min.js', express.static(__dirname + '/public/javascript/angular.min.js'));
-
+app.use('/fingerprintCore/tabsLink', express.static(__dirname + '/public/tabsLink.html'));
 
 app.use('/fingerprintCore',fingerprintCore);
 app.use('/fingerprintCore',sessionsCore);

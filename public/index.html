@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <title>Fingerprint report</title>
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="stylesheets/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
 
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="stylesheets/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
     <script src="javascript/jquery.min.js"></script>
     <script src="javascript/bootstrap.min.js"></script>
     <script src="javascript/angular.min.js"></script>
@@ -40,6 +38,7 @@
             <th>First Name</th>
             <th>Last Name</th>
             <th>Branch</th>
+			<th>Company</th>
             <th>Supervisor?</th>
         </tr>
         </thead>
@@ -49,8 +48,9 @@
             <td style ="word-break:break-all;">{{employee.first_name}}</td>
             <td style ="word-break:break-all;">{{employee.last_name}}</td>
             <td style ="word-break:break-all;"><button type="button" class="btn btn-info" ng-click="setEmpCodeSelected(employee.employeeCode)" data-toggle="modal" data-target="#branchesModal">{{employee.emp_branch}}</button></td>
+            <td style ="word-break:break-all;">{{employee.emp_company}}</td>
             <td style ="word-break:break-all;">{{employee.isSuperVisor}}</td>
-            <td style ="word-break:break-all;"><a href="#" data-toggle="popover" ng-if="!employee.isSuperVisor" title="Supervisor" data-content="{{message}}"><button class="btn btn-success" ng-click="showSupervisor(employee.emp_branch)">Show Branch Supervisor</button></a></td>
+			<td style ="word-break:break-all;"><a href="#" data-toggle="popover" ng-if="!employee.isSuperVisor" title="Supervisor" data-content="{{message}}"><button class="btn btn-success" ng-click="showSupervisor(employee.emp_branch)">Show Branch Supervisor</button></a></td>
             <td style ="word-break:break-all;"><button class="btn btn-success" ng-if="!employee.isSuperVisor"  ng-click="makeSuperVisor(employee.employeeCode, employee.emp_branch)">Make Supervisor</button></td>
             <td style ="word-break:break-all;"><button class="btn btn-danger" ng-click="disableUser(employee._id)">Disable</button></td>
         </tr>
@@ -103,6 +103,7 @@
                 url : "/fingerprintCore/fingerprint"
             }).then(function mySucces(response) {
 
+				console.log(response.data.content);
                 $scope.fingerprintContent = response.data.content;
 
             }, function myError(response) {

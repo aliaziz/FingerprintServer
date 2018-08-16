@@ -9,6 +9,37 @@ var randomPasswordModel = require('../models/randomPasswordModel');
 var delayedSessionModel = require('../models/delayedSessionActivationModel');
 var lateEmployeesModel = require('../models/lateModels');
 var configureLoginTimeModel = require('../models/loginTimesModel');
+var companyModel = require('../models/companyModel');
+var defaultMessage = require("./defaultReturnMessage");
+
+router.get('/fingerprint/getCompanies',function(req, res){
+    companyModel.find(function(err, doc){
+        if (err) return(err);
+        else{
+            res.json(defaultMessage.returnMessage(true,"success",doc));
+        }
+    });
+});
+
+router.post('/fingerprint/addCompanies',function(req,res){
+	console.log(req.body);
+    var companyModelInstance = new companyModel(req.body);
+    companyModelInstance.save(function(err,doc){
+        if(err) return(err);
+        else{
+            res.json(defaultMessage.returnMessage(true, "success",doc));
+        }
+    });
+});
+
+router.delete('/fingerprint/deleteCompany/:id',function(req, res){
+    companyModel.remove({_id:req.params.id},function(err, doc){
+        if(err) return(err);
+        else{
+            res.json(defaultMessage.returnMessage(true, "success",doc));
+        }
+    });
+});
 
 router.get('/fingerprint/getLoginTime',function(req, res){
     configureLoginTimeModel.find(function(err, doc){
@@ -433,7 +464,6 @@ router.get('/fingerprint/downgradeRights/:empCode/:empBranch', function(req, res
         }
     });
 });
-
 
 //update employee branch
 router.put('/fingerprint/changeBranch/:empCode/:newBranch', function(req, res){

@@ -16,6 +16,7 @@ var fingerPrintModel = new Schema({
     image_size: String,
     image_hex:String,
     emp_branch:String,
+	emp_company: String,
     isSuperVisor:Boolean,
     supervisedBranches : {
         type: Array

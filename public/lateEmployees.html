@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>Fingerprint report</title>
+    <title>Late Employees</title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
 
@@ -16,7 +16,7 @@
 <body>
 <div ng-app="fingerprint" id="linksHeader" class="container" ng-controller="controllerX">
 
-    <h1>Employee summary</h1>
+    <h1>Late employees</h1>
 	<div id = "tabsLink" w3-include-html="tabsLink.html"></div>
     <!--Search form-->
     <form>
@@ -36,17 +36,17 @@
             <th>Employee Code</th>
             <th>First Name</th>
             <th>Last Name</th>
-            <th>Phone number</th>
-            <th>InActive hours</th>
+			<th>Time at office</th>
+			<th>Date</th>
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="employee in empDetails | filter:search">
-            <td style ="word-break:break-all;">{{employee.employeeCode}}</td>
-            <td style ="word-break:break-all;">{{employee.first_name}}</td>
-            <td style ="word-break:break-all;">{{employee.last_name}}</td>
-            <td style ="word-break:break-all;">{{employee.emp_phoneNumber}}</td>
-            <td style ="word-break:break-all;">{{empDelays[$index].sessionDelayedPeriod}}</td>
+        <tr ng-repeat="employee in empDelays | filter:search">
+            <td style ="word-break:break-all;">{{employee.empCode}}</td>
+            <td style ="word-break:break-all;">{{empDetails[$index].first_name}}</td>
+            <td style ="word-break:break-all;">{{empDetails[$index].last_name}}</td>
+            <td style ="word-break:break-all;">{{employee.time}}</td>
+			<td style ="word-break:break-all;">{{employee.date}}</td>
             </tr>
         </tbody>
     </table>
@@ -56,8 +56,8 @@
 <script>
     var app = angular.module('fingerprint', []);
     app.controller('controllerX', function($scope, $http) {
-        $scope.empDelays = [];
 		$scope.empDetails = []
+        $scope.empDelays = [];
 
         var refreshPage = function(){
             window.location.reload();
@@ -67,7 +67,7 @@
         var refreshContent = function(){
             $http({
                 method : "GET",
-                url : "/fingerprintCore/fingerprint/getDelayedActivation"
+                url : "/fingerprintCore/fingerprint/getLateEmployees"
             }).then(function mySucces(response) {
 				$scope.empDetails = response.data.empDetails
 				$scope.empDelays = response.data.empDelays
