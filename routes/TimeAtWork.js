@@ -58,7 +58,6 @@ router.post('/timeAtWorkSupervisor',function(req,res){
 					return res.json(err);
 				}
 				else {
-					console.log(req.body.empCode+" time at work supervisor "+doc);
 					res.json({
 						"success":true,
 						"content":doc
@@ -81,7 +80,6 @@ router.post('/timeAtWork',function(req,res){
 			console.log("errored "+ err);
             return res.json(err);
         }else if(response!=null){
-			console.log("not null "+ response);
             res.json({
                 "success": true,
                 "content": response
@@ -94,7 +92,6 @@ router.post('/timeAtWork',function(req,res){
 					return res.json(err);
 				}
 				else {
-			console.log("not null "+ doc);
 					res.json({
 						"success":true,
 						"content":doc
@@ -138,7 +135,6 @@ router.get('/workHours/:empCode/:dateOnly',function(req, res){
 
                     timeDifferenceCombined = "Hours "+timeDifferenceHours+" Minutes "+timeDifferenceHMinutes +" Seconds "+timeDifferenceSeconds
                     firstLoginTimePerDay = docs[x].loginTime;
-                    console.log(timeDifferenceCombined+" time diff\n "+firstLoginTimePerDay+" first login time\n");
                 }
             }
             res.json({

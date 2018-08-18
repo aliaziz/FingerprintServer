@@ -17,8 +17,11 @@
 <div ng-app="fingerprint" class="container" ng-controller="controllerX">
 
     <h1>Employee fingerprint details</h1>
-    <div id = "tabsLink" w3-include-html="tabsLink.html"></div>
-
+    <div id = "tabsLink"></div>
+	<div class="col-md-12">
+		<button style = "margin: 10px;" class="btn btn-danger float-right" ng-click="getPassword()">
+		Get registration password</button>
+	</div>
     <!--Search form-->
     <form>
         <div class="form-group">
@@ -103,8 +106,12 @@
                 url : "/fingerprintCore/fingerprint"
             }).then(function mySucces(response) {
 
-				console.log(response.data.content);
-                $scope.fingerprintContent = response.data.content;
+				for (var emp = 0; emp < response.data.content.length; emp++) {
+					if (response.data.content[emp].isEnabled) {
+						$scope.fingerprintContent.push(response.data.content[emp])
+					}
+				}
+                
 
             }, function myError(response) {
 
@@ -182,18 +189,19 @@
             });
         };
 
-        //delete user
+        //disable user
         $scope.disableUser = function(id){
-            console.log(id+" ===");
-            $http({
-                method:"DELETE",
-                url:"/fingerprintCore/fingerprint/disable/"+id
-            }).then(function succeeded(response){
-                console.log(response);
-                refreshContent();
-            },function failure(responseErr){
-                console.log(responseErr);
-            });
+			var reason = prompt("Enter reason for termination", "Reason");
+			if (reason != null) {
+				 $http({
+					method:"PUT",
+					url:"/fingerprintCore/fingerprint/disable/"+id+"/"+reason
+				}).then(function succeeded(response){
+				    location.reload();
+				},function failure(responseErr){
+					console.log(responseErr);
+				});
+			}
         };
 
         //update branch
@@ -210,10 +218,31 @@
             });
 
         };
+		
+		$scope.getPassword = function() {
+			var url = "http://localhost:3000/fingerprintCore/fingerprint/getpassword";
+			$http({
+                method:"GET",
+                url: url
+            }).then(function succeeded(response){
+				alert(response.data.content);
+            },function failed(responseErr){
+                console.log(responseErr);
+            });
+			
+		}
     });
 
 </script>
 
-<script src="javascript/includeHTML.js"></script>
+<script src="javascript/includeHTML.js">	
+</script>
+<script>
+	$(document).ready(function(){
+		setTimeout(function() {
+			$("#emps").addClass('active');
+		}, 500)
+	});
+</script>
 </body>
 </html>

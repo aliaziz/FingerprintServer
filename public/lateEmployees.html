@@ -30,6 +30,11 @@
         </div>
     </form>
     <div id = "alert_placeholder"></div>
+	<div class="row col-md-12" style="margin: 10px;">
+		<button class="col-md-5 btn btn-success" ng-click="loadWeekly()">Load weekly</button>
+		<div class="col-md-2"></div>
+		<button class="col-md-5 btn btn-primary" ng-click="loadMonthly()">Load monthly</button>
+	</div>
     <table class="table table-condesed table-striped table-bordered">
         <thead>
         <tr>
@@ -64,11 +69,16 @@
         };
 
         //refresh content
-        var refreshContent = function(){
+        var refreshContent = function(isMonthly){
+			var url = "/fingerprintCore/fingerprint/getWeekLateEmployees";
+			if (isMonthly) {
+				url = "/fingerprintCore/fingerprint/getMonthLateEmployees";
+			}
             $http({
                 method : "GET",
-                url : "/fingerprintCore/fingerprint/getLateEmployees"
+                url : url
             }).then(function mySucces(response) {
+				console.log(response.data);
 				$scope.empDetails = response.data.empDetails
 				$scope.empDelays = response.data.empDelays
 
@@ -79,11 +89,25 @@
 
             });
         };
+	
+		$scope.loadWeekly = function() {
+			console.log("load weekly..");
+			refreshContent(false);
+		}
 		
-        refreshContent();
+		$scope.loadMonthly = function() {
+			refreshContent(true);
+		}
     });
 
 </script>
 <script src="javascript/includeHTML.js"></script>
+<script>
+	$(document).ready(function(){
+		setTimeout(function() {
+			$("#late").addClass('active');
+		}, 500)
+	});
+</script>
 </body>
 </html>

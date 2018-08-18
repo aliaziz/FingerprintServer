@@ -9,7 +9,7 @@ var employeeCodeModel = require('../models/employeeCodesModel');
 var id;
 
 function saveFirstEmployeeID(req, res){
-    var employeeCodeModelInstance  = new employeeCodeModel({"empCode":"EMP01"});
+    var employeeCodeModelInstance  = new employeeCodeModel({"empCode":"1"});
     employeeCodeModelInstance.save(function (err, doc) {
         if (err) {
             return res.json(err+" from error 1");
@@ -67,7 +67,7 @@ function generateNewEmpCode(empCodeGenerated, req, res){
     var currentID = parseInt(empCodeGenerated.replace(/[^0-9\.]/g, ''), 10);
     var newID = currentID+1;
     console.log(newID+" new id");
-    var employeeCodeModelInstance  = new employeeCodeModel({"empCode":"EMP0"+newID});
+    var employeeCodeModelInstance  = new employeeCodeModel({"empCode":+newID});
     employeeCodeModel.findOne({'empCode':newID},function(err, response) {
         if (err) {
             res.json({

@@ -175,7 +175,7 @@ router.get('/fingerprint/getDelayedActivation', function(req, res) {
 
 router.post('/fingerprint/lateEmployees', function(req, res) {
 
-	lateEmployeesModel.findOne({'empCode': req.body.empCode, 'date': req.body.date}, function (err, lateEmpDoc) {
+	lateEmployeesModel.findOne({'empCode': req.body.empCode}, function (err, lateEmpDoc) {
 		if (err) {
 			res.json({
 				'success': false
@@ -188,6 +188,7 @@ router.post('/fingerprint/lateEmployees', function(req, res) {
 			//new day
 			var lateLoginThreshold = parseInt("0930");
 			configureLoginTimeModel.findOne(function(timeErr, timeDoc) {
+				console.log(timeDoc);
 				if (timeErr) return timeErr;
 				else if (timeDoc != null){
 					lateLoginThreshold = parseInt((timeDoc.loginTime).replace(':',''));
@@ -196,6 +197,7 @@ router.post('/fingerprint/lateEmployees', function(req, res) {
 				if (lateLoginThreshold < parseInt((req.body.time).replace(':',''))) {
 					lateEmployeeInstance.isLate = true;
 				}
+				console.log(lateEmployeeInstance);
 				
 				lateEmployeeInstance.save(function(err, doc) {
 					if (err) {
@@ -215,9 +217,32 @@ router.post('/fingerprint/lateEmployees', function(req, res) {
 
 	
 });
+function getDate(daysAgo) {
+	var today = new Date();
+	today.setDate(today.getDate() - daysAgo);
+	
+	var dd = today.getDate();
+	var mm = today.getMonth()+1; //January is 0!
 
-router.get('/fingerprint/getLateEmployees', function(req, res){
-	lateEmployeesModel.find(function(err, doc) {
+	var yyyy = today.getFullYear();
+	if(dd<10){
+		dd='0'+dd;
+	} 
+	if(mm<10){
+		mm='0'+mm;
+	} 
+	var today = dd+'-'+mm+'-'+yyyy;	
+	return today;
+}
+
+router.get('/fingerprint/getMonthLateEmployees', function(req, res){
+	var fromDate = getDate(20);
+	var toDate = getDate(0);
+	lateEmployeesModel.find({'isLate': true, 'date': {
+		'$gte': fromDate,
+		'$lte': toDate,
+	}}, function(err, doc) {
+		
 		if (err) {
 			res.json({
 				"success": false
@@ -226,10 +251,85 @@ router.get('/fingerprint/getLateEmployees', function(req, res){
 			var promises = [];
 			
 			for (var pos = 0; pos < doc.length; pos++) {
-				if (doc[pos].isLate) {					
-					var empCode = doc[pos].empCode;
-					promises.push(getEmployee(empCode));
-				}
+				var empCode = doc[pos].empCode;
+				promises.push(getEmployee(empCode));
+			}
+
+			Promise.all(promises)    
+			 .then(function(data){ 
+				res.json({
+					"success": true, 
+					"empDetails": data,
+					"empDelays": doc
+				});
+			 }).catch(function(err){ 
+				res.json({
+					"success": false
+				});
+			 });    
+		}else {
+            res.json({
+                "success": true,
+                "content": doc
+            });
+        }
+	})
+});
+
+router.get('/fingerprint/getWeekLateEmployees', function(req, res){
+	var fromDate = getDate(7);
+	var toDate = getDate(0);
+	lateEmployeesModel.find({'isLate': true, 'date': {
+		'$gte': fromDate,
+		'$lte': toDate,
+	}}, function(err, doc) {
+		
+		if (err) {
+			res.json({
+				"success": false
+			});
+		}else if (doc.length > 0){
+			var promises = [];
+			
+			for (var pos = 0; pos < doc.length; pos++) {
+				var empCode = doc[pos].empCode;
+				promises.push(getEmployee(empCode));
+			}
+
+			Promise.all(promises)    
+			 .then(function(data){ 
+				res.json({
+					"success": true, 
+					"empDetails": data,
+					"empDelays": doc
+				});
+			 }).catch(function(err){ 
+				res.json({
+					"success": false
+				});
+			 });    
+		}else {
+            res.json({
+                "success": true,
+                "content": doc
+            });
+        }
+	})
+});
+
+router.get('/fingerprint/getLateEmployees', function(req, res){
+	lateEmployeesModel.find({'isLate': true}, function(err, doc) {
+		
+		if (err) {
+			res.json({
+				"success": false
+			});
+		}else if (doc.length > 0){
+			var promises = [];
+			
+			for (var pos = 0; pos < doc.length; pos++) {
+				var empCode = doc[pos].empCode;
+				promises.push(getEmployee(empCode));
 			}
 
 			Promise.all(promises)    
@@ -363,6 +463,7 @@ function getEmployee(code){
 			if(err){
 				reject(err)
 			}else if(response!=null){
+				console.log(response);
 				resolve(response)
 			}else{
 				reject(err)
@@ -494,13 +595,16 @@ router.put('/fingerprint/changeBranch/:empCode/:newBranch', function(req, res){
     });
 });
 
-//delete user from database
-router.delete('/fingerprint/disable/:id',function(req, res){
-    var id = req.params.id;
-    fingerPrintModel.remove({_id : id }, function(err){
-        if(err) return handleError(err);
+//update user from database
+router.put('/fingerprint/disable/:id/:reason',function(req, res){
+    var id = req.params.id
+	var reason = req.params.reason
+    fingerPrintModel.findOneAndUpdate({_id : id },
+		{$set: {isEnabled: false, terminationReason: reason}},
+		function(err){
+			if(err) return handleError(err);
 
-        res.send({message:"disabled successfully"});
+			res.send({message:"disabled successfully"});
     });
 });
 

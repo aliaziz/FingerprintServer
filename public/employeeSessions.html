@@ -64,12 +64,6 @@
         }).then(function mySucces(response) {
 
             $scope.fingerprintContent = response.data;
-			for (var i=0; i < $scope.fingerprintContent.length; i++) {
-				var today = new Date($scope.fingerprintContent[i].logoutTime *1);
-				
-				$scope.fingerprintContent[i].logoutTime = formatTime(today);
-			}
-            console.log($scope.fingerprintContent+" "+response.data);
 
         }, function myError(response) {
 
@@ -96,5 +90,12 @@
 	}
 </script>
 <script src="javascript/includeHTML.js"></script>
+<script>
+	$(document).ready(function(){
+		setTimeout(function() {
+			$("#sessions").addClass('active');
+		}, 500)
+	});
+</script>
 </body>
 </html>

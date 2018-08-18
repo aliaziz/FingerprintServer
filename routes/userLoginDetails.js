@@ -9,10 +9,9 @@ var cron = require('node-cron');
 var task = cron.schedule('*/600 * * * *', function() {
     loginDetails.update({isLoggedIn:true}, {isLoggedIn: false}, {multi: true},
         function(err, num) {
-            console.log("updated "+num);
+            console.log("cron job updated "+num);
         }
     );
-    console.log('immediately started');
 });
 
 router.get('/userLoginDetails/:empCode',function(req, res){
@@ -66,7 +65,6 @@ router.post('/userLoginDetails',function(req,res){
                     return res.json(error);
                 }
                 else {
-                    console.log(bodyContent.empCode+" user login details");
                     res.json({
                         "success":true,
                         "content":doc
@@ -75,7 +73,6 @@ router.post('/userLoginDetails',function(req,res){
                 }
             });
         }else{
-            console.log(bodyContent.empCode+" user login details "+req.body.empCode);
             loginDetails.findOneAndUpdate({'empCode': bodyContent.empCode},
                 bodyContent, {new: true},
 
@@ -83,7 +80,6 @@ router.post('/userLoginDetails',function(req,res){
                     if(errorDetails){
                         console.log("Something wrong when updating data!");
                     }else{
-                        console.log(docDetails+" is nara");
                         res.json({
                             "success":true,
                             "content":docDetails

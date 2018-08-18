@@ -32,7 +32,6 @@ router.post('/sessions',function(req,res){
                 "content": doc
             });
         }
-        console.log("emp session "+doc);
     });
 });
 

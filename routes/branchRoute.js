@@ -22,16 +22,12 @@ function saveFirstBranchCode(req,res){
                 res.json({
                     "content":details
                 });
-
-                console.log(details+" saving new code");
-
             });
         }
     });
 }
 
 router.put('/getBranches/updateBranch/:branchCode',function(req, res){
-    console.log(req.body.branchName+" "+req.body.branchAddress1+" "+req.body.branchAddress2);
     branchModel.findOneAndUpdate({'branchCode':req.params.branchCode},{
         $set:{
             'branchCode'        :req.params.branchCode,
@@ -108,7 +104,6 @@ router.get('/getBranches/getNewBranchCode', function(req, res){
             }else{
 
                 //generate new branch ID and save it
-                console.log(post.branchCode+"===>>>>");
                 if(post.branchCode == undefined){
                     saveFirstBranchCode(req, res);
                 }else{
@@ -148,7 +143,6 @@ function generateNewBranchCode(branchCodeGenerated, req, res){
     //increment current branchCode
     var currentID = parseInt(branchCodeGenerated.replace(/[^0-9\.]/g, ''), 10);
     var newID = currentID+1;
-    console.log(newID+" new id");
 
     var branchCodesModelInstance  = new branchCodesModel({"branchCode":"BR-000"+newID});
     branchCodesModel.findOne({'branchCode':newID},function(err, response) {
