@@ -18,10 +18,11 @@
 
     <h1>Employee fingerprint details</h1>
     <div id = "tabsLink"></div>
-	<div class="col-md-12">
-		<button style = "margin: 10px;" class="btn btn-danger float-right" ng-click="getPassword()">
-		Get registration password</button>
-	</div>
+    <button style = "margin: 10px;" class="btn btn-danger float-right" 
+    ng-click="getPassword()">Get registration password</button>
+    <span id="regPassword" style="background: {{backColor}};color: white;padding: 10px;margin-top: 5px;" 
+    class="float-right">{{regPassword}}</span>
+   
     <!--Search form-->
     <form>
         <div class="form-group">
@@ -94,6 +95,8 @@
         $scope.branchesList = [];
         $scope.fingerprintContent = [];
         $scope.supervisors = [];
+        $scope.regPassword = "";
+        $scope.backColor = "none";
 
         var refreshPage = function(){
             window.location.reload();
@@ -225,7 +228,8 @@
                 method:"GET",
                 url: url
             }).then(function succeeded(response){
-				alert(response.data.content);
+                $scope.regPassword = response.data.content;
+                $scope.backColor = "green";
             },function failed(responseErr){
                 console.log(responseErr);
             });
